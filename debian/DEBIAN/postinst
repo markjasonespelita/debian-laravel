@@ -1,0 +1,25 @@
+
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        for path in \
+            /usr/bin/caller \
+            /usr/bin/binary \
+            /usr/lib/laracli \
+            /usr/lib/laracli/install-root
+        do
+            if [ -e "$path" ]; then
+                chown -R root:root "$path"
+            fi
+        done
+
+        chmod 755 /usr/bin/caller
+        chmod 755 /usr/bin/binary
+        chmod 755 /usr/lib/laracli
+        chmod 755 /usr/lib/laracli/install-root
+        ;;
+esac
+
+exit 0
