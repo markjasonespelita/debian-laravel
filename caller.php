@@ -2,9 +2,9 @@
 <?php
 
 $environment = "DEV";
-$package_name = "zyphor";
+$package_name = "zyphors";
 
-if ($environment === "DEV") {
+if ($environment === "PROD") {
     chdir(__DIR__ . '/application');
 } else {
     chdir(__DIR__ . '/usr/lib/' . $package_name);
@@ -13,7 +13,7 @@ if ($environment === "DEV") {
 // Forward all arguments to Artisan
 $arguments = array_slice($argv, 1);
 
-$command = 'php artisan ' . implode(
+$command = 'php ' . implode(
     ' ',
     array_map('escapeshellarg', $arguments ?: ['list'])
 );

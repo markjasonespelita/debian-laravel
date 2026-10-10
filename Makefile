@@ -3,7 +3,7 @@
 COMPILER := g++
 QTFLAGS := $(shell pkg-config --cflags --libs Qt6Widgets Qt6WebEngineWidgets)
 
-PACKAGE_NAME := zyphor
+PACKAGE_NAME := zyphors
 STAGING := debian
 DIST_DIR := dist
 
@@ -35,10 +35,6 @@ release-app: compile-app
 	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)
 	cp -a application/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/
 
-	# Copy scripts
-	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts
-	cp -a scripts/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts/
-
 	# Set post-installation script permissions
 	chmod 755 $(STAGING)/DEBIAN/postinst
 
@@ -62,10 +58,6 @@ release-cli: compile
 	# Copy application files
 	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)
 	cp -a application/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/
-
-	# Copy scripts
-	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts
-	cp -a scripts/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts/
 
 	# Set post-installation script permissions
 	chmod 755 $(STAGING)/DEBIAN/postinst

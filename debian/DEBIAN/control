@@ -1,9 +1,8 @@
-Package: zyphor
-Version: 1.0.1-r1
+Package: zyphors
+Version: 2.0.3-r5
 Section: admin
 Priority: optional
 Architecture: all
 Maintainer: Mark Jason Espelita
-Depends: bash,sh
+Depends: bash, php, libapache2-mod-php, php-mbstring, php-xml, php-curl
 Description: Application Description
-

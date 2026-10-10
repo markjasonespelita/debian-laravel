@@ -17,14 +17,13 @@ int main(int argc, char *argv[])
     QProcess server;
 
     // Change this to your PHP project's directory
-    // server.setWorkingDirectory("/usr/lib/zyphor"); // production
-    server.setWorkingDirectory("application"); // development
+    server.setWorkingDirectory("/usr/lib/zyphors"); // production
+    // server.setWorkingDirectory("application"); // development
 
     // Start PHP
     server.start("php", QStringList()
-                 << "artisan"
-                 << "serve"
-                 << "--port=2438");
+                 << "-S"
+                 << "localhost:2438");
 
     if (!server.waitForStarted(5000))
     {

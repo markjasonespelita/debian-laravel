@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+PACKAGE_NAME="zyphors"
+APP_DIR="/usr/lib/$PACKAGE_NAME"
+
+case "$1" in
+    remove|purge)
+        # dpkg only deletes files it installed. Anything created at runtime
+        # (compiled views, cache, sessions, logs, vendor changes) is left behind,
+        # so wipe the whole application directory.
+        # Safety guard: never run rm -rf against an empty/odd path.
+        if [ -n "$PACKAGE_NAME" ] && [ "$APP_DIR" = "/usr/lib/$PACKAGE_NAME" ] && [ -d "$APP_DIR" ]; then
+            rm -rf -- "$APP_DIR"
+        fi
+        ;;
+
+    upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+        # Do nothing: the new version's files are being installed over the old ones.
+        ;;
+esac
+
+exit 0

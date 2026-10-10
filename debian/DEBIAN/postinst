@@ -1,13 +1,21 @@
 #!/bin/sh
 set -e
 
-PACKAGE_NAME="zyphor"
+PACKAGE_NAME="zyphors"
+APP_DIR="/usr/lib/$PACKAGE_NAME"
+
+# User/group that actually runs the Laravel app (and therefore compiles views,
+# writes logs, sessions, cache). www-data = Apache/Nginx/php-fpm.
+# If you start it yourself with `php artisan serve`, set these to that user.
+APP_USER="www-data"
+APP_GROUP="www-data"
 
 case "$1" in
     configure)
+        # 1. Code is owned by root (read-only for everyone else)
         for path in \
             "/usr/bin/$PACKAGE_NAME" \
-            "/usr/lib/$PACKAGE_NAME"
+            "$APP_DIR"
         do
             if [ -e "$path" ]; then
                 chown -R root:root "$path"
@@ -16,13 +24,52 @@ case "$1" in
 
         for path in \
             "/usr/bin/$PACKAGE_NAME" \
-            "/usr/lib/$PACKAGE_NAME" \
-            "/usr/lib/$PACKAGE_NAME/scripts"
+            "$APP_DIR" \
+            "$APP_DIR/scripts"
         do
             if [ -e "$path" ]; then
                 chmod 755 "$path"
             fi
         done
+
+        if [ -d "$APP_DIR/scripts" ]; then
+            find "$APP_DIR/scripts" -type f -exec chmod 755 {} +
+        fi
+
+        # 2. Laravel runtime directories must be writable by the app user.
+        #    (Must come AFTER the root:root chown above, otherwise it gets undone.)
+        if [ -d "$APP_DIR" ]; then
+            mkdir -p \
+                "$APP_DIR/storage/app/public" \
+                "$APP_DIR/storage/framework/cache/data" \
+                "$APP_DIR/storage/framework/sessions" \
+                "$APP_DIR/storage/framework/testing" \
+                "$APP_DIR/storage/framework/views" \
+                "$APP_DIR/storage/logs" \
+                "$APP_DIR/bootstrap/cache"
+
+            if id "$APP_USER" >/dev/null 2>&1 && getent group "$APP_GROUP" >/dev/null 2>&1; then
+                # Drop stale compiled views left over from the previous version
+                find "$APP_DIR/storage/framework/views" -type f -name '*.php' -delete
+
+                for dir in \
+                    "$APP_DIR/storage" \
+                    "$APP_DIR/bootstrap/cache"
+                do
+                    chown -R "$APP_USER:$APP_GROUP" "$dir"
+                    find "$dir" -type d -exec chmod 775 {} +
+                    find "$dir" -type f -exec chmod 664 {} +
+                done
+
+                # .env holds APP_KEY / secrets: readable by the app, not by everyone
+                if [ -f "$APP_DIR/.env" ]; then
+                    chown root:"$APP_GROUP" "$APP_DIR/.env"
+                    chmod 640 "$APP_DIR/.env"
+                fi
+            else
+                echo "$PACKAGE_NAME: user/group $APP_USER:$APP_GROUP not found, storage left root-owned" >&2
+            fi
+        fi
         ;;
 esac
 
