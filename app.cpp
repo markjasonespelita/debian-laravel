@@ -17,8 +17,8 @@ int main(int argc, char *argv[])
     QProcess server;
 
     // Change this to your PHP project's directory
-    server.setWorkingDirectory("/usr/lib/zyphor"); // production
-    // server.setWorkingDirectory("application"); // development
+    // server.setWorkingDirectory("/usr/lib/zyphor"); // production
+    server.setWorkingDirectory("application"); // development
 
     // Start PHP
     server.start("php", QStringList()
