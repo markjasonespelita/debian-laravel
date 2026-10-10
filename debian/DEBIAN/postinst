@@ -1,24 +1,28 @@
-
 #!/bin/sh
 set -e
+
+PACKAGE_NAME="zyphor"
 
 case "$1" in
     configure)
         for path in \
-            /usr/bin/caller \
-            /usr/bin/binary \
-            /usr/lib/laracli \
-            /usr/lib/laracli/install-root
+            "/usr/bin/$PACKAGE_NAME" \
+            "/usr/lib/$PACKAGE_NAME"
         do
             if [ -e "$path" ]; then
                 chown -R root:root "$path"
             fi
         done
 
-        chmod 755 /usr/bin/caller
-        chmod 755 /usr/bin/binary
-        chmod 755 /usr/lib/laracli
-        chmod 755 /usr/lib/laracli/install-root
+        for path in \
+            "/usr/bin/$PACKAGE_NAME" \
+            "/usr/lib/$PACKAGE_NAME" \
+            "/usr/lib/$PACKAGE_NAME/scripts"
+        do
+            if [ -e "$path" ]; then
+                chmod 755 "$path"
+            fi
+        done
         ;;
 esac
 
