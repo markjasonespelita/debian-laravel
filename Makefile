@@ -1,12 +1,11 @@
-
-.PHONY: all compile compile-app release clean
+.PHONY: all compile compile-app release-app release-cli clean add
 
 COMPILER := g++
 QTFLAGS := $(shell pkg-config --cflags --libs Qt6Widgets Qt6WebEngineWidgets)
 
 PACKAGE_NAME := zyphor
 STAGING := debian
-BUILD_DIR := binary
+DIST_DIR := dist
 
 all: compile compile-app
 
@@ -15,39 +14,101 @@ compile:
 	php -r 'file_put_contents("caller", "#!/usr/bin/env php\n" . php_strip_whitespace("caller.php"));'
 	chmod 755 caller
 
-# Compile the Qt WebView application
+# Compile the Qt WebEngine application
 compile-app:
 	@pkg-config --exists Qt6Widgets Qt6WebEngineWidgets || \
 		(echo "Missing Qt development dependencies."; \
 		 echo "Install: sudo apt install qt6-base-dev qt6-webengine-dev pkg-config"; exit 1)
-	mkdir -p $(BUILD_DIR)/usr/bin
-	$(COMPILER) app.cpp -o $(BUILD_DIR)/usr/bin/binary $(QTFLAGS)
-	$(COMPILER) app.cpp -o app $(QTFLAGS)
-
-# Prepare the Debian package and build the .deb
-release: all
 	mkdir -p $(STAGING)/usr/bin
-	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)
+	$(COMPILER) app.cpp -o $(STAGING)/usr/bin/$(PACKAGE_NAME) $(QTFLAGS)
 
-	install -m 755 caller $(STAGING)/usr/bin/caller
-	install -m 755 $(BUILD_DIR)/usr/bin/binary $(STAGING)/usr/bin/binary
+# Release the Qt WebEngine application
+release-app: compile-app
+	mkdir -p $(DIST_DIR)
 
-	install -m 755 scripts/install-root \
-		$(STAGING)/usr/lib/$(PACKAGE_NAME)/install-root
+	# Remove stale CLI/application staging files
+	rm -f $(STAGING)/usr/bin/$(PACKAGE_NAME)
+	$(COMPILER) app.cpp -o $(STAGING)/usr/bin/$(PACKAGE_NAME) $(QTFLAGS)
 
-	chmod 755 $(STAGING)/DEBIAN/postinst
-	chown -R root:root $(STAGING)/usr/bin $(STAGING)/usr/lib
-
-	mkdir -p dist
-	dpkg-deb --build $(STAGING) dist/$(PACKAGE_NAME).deb
-
-	@echo "Release package created: dist/$(PACKAGE_NAME).deb"
-
-# Remove generated build files and release artifacts
-clean:
-	rm -rf $(BUILD_DIR)
-	rm -f app caller
-	rm -rf dist
-	rm -f $(STAGING)/usr/bin/caller
-	rm -f $(STAGING)/usr/bin/binary
+	# Copy application files
 	rm -rf $(STAGING)/usr/lib/$(PACKAGE_NAME)
+	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)
+	cp -a application/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/
+
+	# Copy scripts
+	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts
+	cp -a scripts/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts/
+
+	# Set post-installation script permissions
+	chmod 755 $(STAGING)/DEBIAN/postinst
+
+	# Build the application package
+	dpkg-deb --build $(STAGING) $(DIST_DIR)/$(PACKAGE_NAME)-app.deb
+	@echo "Application package created: $(DIST_DIR)/$(PACKAGE_NAME)-app.deb"
+
+	cp $(STAGING)/usr/bin/$(PACKAGE_NAME) app
+
+# Release the PHP CLI application
+release-cli: compile
+	mkdir -p $(DIST_DIR)
+
+	# Remove stale Qt/application staging files
+	rm -f $(STAGING)/usr/bin/$(PACKAGE_NAME)
+	rm -rf $(STAGING)/usr/lib/$(PACKAGE_NAME)
+
+	# Install PHP CLI launcher
+	install -m 755 caller $(STAGING)/usr/bin/$(PACKAGE_NAME)
+
+	# Copy application files
+	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)
+	cp -a application/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/
+
+	# Copy scripts
+	mkdir -p $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts
+	cp -a scripts/. $(STAGING)/usr/lib/$(PACKAGE_NAME)/scripts/
+
+	# Set post-installation script permissions
+	chmod 755 $(STAGING)/DEBIAN/postinst
+
+	# Build the CLI package
+	dpkg-deb --build $(STAGING) $(DIST_DIR)/$(PACKAGE_NAME).deb
+	@echo "CLI package created: $(DIST_DIR)/$(PACKAGE_NAME).deb"
+
+# Clean generated files while preserving Debian metadata
+clean:
+	rm -f app
+	rm -f caller
+	rm -f $(STAGING)/usr/bin/$(PACKAGE_NAME)
+	rm -rf $(STAGING)/usr/lib/$(PACKAGE_NAME)
+	rm -rf $(DIST_DIR)
+
+add:
+	git add Makefile
+	git commit -m "chore: update Makefile"
+
+	git add app
+	git commit -m "chore: remove legacy app launcher"
+
+	git add app.cpp
+	git commit -m "chore: update C++ application source"
+
+	git add binary/usr/bin/binary
+	git commit -m "chore: remove legacy binary executable"
+
+	git add caller
+	git commit -m "chore: remove legacy caller executable"
+
+	git add caller.php
+	git commit -m "chore: update PHP caller script"
+
+	git add debian/DEBIAN/postinst
+	git commit -m "chore: update Debian post-installation script"
+
+	git add debian/usr/bin/binary
+	git commit -m "chore: remove packaged binary executable"
+
+	git add debian/usr/bin/caller
+	git commit -m "chore: remove packaged caller executable"
+
+	git add debian/usr/lib/zyphor/install-root
+	git commit -m "chore: remove Zyphor install-root script"
