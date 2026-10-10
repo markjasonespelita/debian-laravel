@@ -86,29 +86,35 @@ add:
 	git add Makefile
 	git commit -m "chore: update Makefile"
 
-	git add app
-	git commit -m "chore: remove legacy app launcher"
-
 	git add app.cpp
 	git commit -m "chore: update C++ application source"
 
-	git add binary/usr/bin/binary
-	git commit -m "chore: remove legacy binary executable"
-
-	git add caller
-	git commit -m "chore: remove legacy caller executable"
+	git add application/routes/console.php
+	git commit -m "chore: update Laravel console routes"
 
 	git add caller.php
 	git commit -m "chore: update PHP caller script"
 
-	git add debian/DEBIAN/postinst
-	git commit -m "chore: update Debian post-installation script"
+	git add CONFIG
+	git commit -m "chore: add application configuration"
 
-	git add debian/usr/bin/binary
-	git commit -m "chore: remove packaged binary executable"
+	git add application/app/Helpers/
+	git commit -m "feat: add application helper classes"
 
-	git add debian/usr/bin/caller
-	git commit -m "chore: remove packaged caller executable"
+	git add caller
+	git commit -m "chore: add caller executable"
 
-	git add debian/usr/lib/zyphor/install-root
-	git commit -m "chore: remove Zyphor install-root script"
+	git add debian/usr/
+	git commit -m "chore: update Debian package files"
+
+	git add dist/
+	git commit -m "build: add distribution build files"
+
+	git add helpers/
+	git commit -m "feat: add helper utilities"
+
+	git add scripts/sample.sh
+	git commit -m "feat: add sample script"
+
+	git add scripts/updater.sh
+	git commit -m "feat: add updater script"
