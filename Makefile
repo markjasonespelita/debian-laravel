@@ -78,35 +78,56 @@ add:
 	git add Makefile
 	git commit -m "chore: update Makefile"
 
+	git add app
+	git commit -m "chore: remove legacy app launcher"
+
 	git add app.cpp
 	git commit -m "chore: update C++ application source"
 
-	git add application/routes/console.php
-	git commit -m "chore: update Laravel console routes"
+	git add application/index.php
+	git commit -m "chore: update application entry point"
 
-	git add caller.php
-	git commit -m "chore: update PHP caller script"
+	git add application/scripts/install-root
+	git commit -m "chore: remove application install-root script"
 
-	git add CONFIG
-	git commit -m "chore: add application configuration"
+	git add application/scripts/sample.sh
+	git commit -m "chore: remove sample script"
 
-	git add application/app/Helpers/
-	git commit -m "feat: add application helper classes"
+	git add application/scripts/updater.sh
+	git commit -m "chore: remove application updater script"
 
-	git add caller
-	git commit -m "chore: add caller executable"
+	git add debian/DEBIAN/control
+	git commit -m "chore: update Debian package control"
 
-	git add debian/usr/
-	git commit -m "chore: update Debian package files"
+	git add debian/usr/bin/zyphors
+	git commit -m "chore: remove zyphors executable"
 
-	git add dist/
-	git commit -m "build: add distribution build files"
+	git add debian/usr/lib/zyphors/app.php
+	git commit -m "chore: remove legacy zyphors app entry point"
 
-	git add helpers/
-	git commit -m "feat: add helper utilities"
+	git add debian/usr/lib/zyphors/helpers/SystemHelper.php
+	git commit -m "chore: remove legacy SystemHelper"
 
-	git add scripts/sample.sh
-	git commit -m "feat: add sample script"
+	git add debian/usr/lib/zyphors/index.php
+	git commit -m "chore: remove legacy zyphors index"
 
-	git add scripts/updater.sh
-	git commit -m "feat: add updater script"
+	git add debian/usr/lib/zyphors/scripts/install-root
+	git commit -m "chore: remove packaged install-root script"
+
+	git add debian/usr/lib/zyphors/scripts/sample.sh
+	git commit -m "chore: remove packaged sample script"
+
+	git add debian/usr/lib/zyphors/scripts/updater.sh
+	git commit -m "chore: remove packaged updater script"
+
+	git add dist/zyphors-app.deb
+	git commit -m "chore: remove outdated zyphors Debian package"
+
+	git add application/backend/
+	git commit -m "feat: add application backend"
+
+	git add application/process/
+	git commit -m "feat: add application process handlers"
+
+	git add application/template.php
+	git commit -m "feat: add application template"
