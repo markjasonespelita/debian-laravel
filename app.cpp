@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     QWebEngineView view;
     view.resize(900, 500);
-    view.setWindowTitle("Application");
+    view.setWindowTitle("Zyphor Command Center");
 
     // Wait a moment before loading the page
     QTimer::singleShot(2000, [&]() {
